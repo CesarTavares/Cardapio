@@ -176,19 +176,88 @@ checkoutBtn.addEventListener("click", function(){
     updateCartModal();
 })
 
-function checkRestaurantOpen(){
-    const data = new Date();
-    const hora = data.getHours();
-    return hora >= 9 && hora < 19;    
+// function checkRestaurantOpen(){
+//     const data = new Date();
+//     const hora = data.getHours();
+//     return hora >= 9 && hora < 15;    
+// }
+
+// const spanItem = document.getElementById("date-span")
+// const isOpen = checkRestaurantOpen();
+
+// if(isOpen){
+//     spanItem.classList.remove("bg-red-500");
+//     spanItem.classList.add("bg-green-600")
+// }else{
+//     spanItem.classList.remove("bg-green-600");
+//     spanItem.classList.add("bg-red-500")
+// }
+
+// function isRestaurantOpen(openHour = 9, closeHour = 19) {
+//     const now = new Date();
+//     const currentHour = now.getHours();
+//     return currentHour >= openHour && currentHour < closeHour;
+// }
+
+// function updateRestaurantStatus(spanElementId, openHour, closeHour) {
+//     const span = document.getElementById(spanElementId);
+//     if (!span) return;
+
+//     const isOpen = isRestaurantOpen(openHour, closeHour);
+
+//     span.classList.remove("bg-red-500", "bg-green-600");
+//     span.classList.add(isOpen ? "bg-green-600" : "bg-red-500");
+//     span.textContent = isOpen ? "Aberto" : "Fechado";
+// }
+
+// // Exemplo de uso
+// updateRestaurantStatus("date-span", 9, 19);
+
+
+
+function isRestaurantOpen({ openTime, closeTime, openDays }) {
+    const now = new Date();
+    const currentDay = now.getDay(); // 0 = domingo, 1 = segunda, ..., 6 = sábado
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    const [openHour, openMinute] = openTime.split(":").map(Number);
+    const [closeHour, closeMinute] = closeTime.split(":").map(Number);
+    const openMinutes = openHour * 60 + openMinute;
+    const closeMinutes = closeHour * 60 + closeMinute;
+
+    const isDayOpen = openDays.includes(currentDay);
+    const isHourOpen = currentMinutes >= openMinutes && currentMinutes < closeMinutes;
+
+    return isDayOpen && isHourOpen;
 }
 
-const spanItem = document.getElementById("date-span")
-const isOpen = checkRestaurantOpen();
+function updateRestaurantStatus(spanElementId, config) {
+    const span = document.getElementById(spanElementId);
+    if (!span) return;
 
-if(isOpen){
-    spanItem.classList.remove("bg-red-500");
-    spanItem.classList.add("bg-green-600")
-}else{
-    spanItem.classList.remove("bg-green-600");
-    spanItem.classList.add("bg-red-500")
+    const isOpen = isRestaurantOpen(config);
+
+    span.classList.remove("bg-red-500", "bg-green-600");
+    span.classList.add(isOpen ? "bg-green-600" : "bg-red-500");
+    span.textContent = isOpen ? "Aberto agora" : "Fechado agora";
 }
+updateRestaurantStatus("date-span", {
+    openTime: "09:30",           // abre às 09:30
+    closeTime: "19:00",          // fecha às 15:00
+    openDays: [1, 2, 3, 4, 5]    // 1 = segunda, ..., 5 = sexta
+});
+
+/* Explicando os openDays:
+Segunda-feira: 1
+
+Terça-feira: 2
+
+Quarta-feira: 3
+
+Quinta-feira: 4
+
+Sexta-feira: 5
+
+Sábado: 6
+
+Domingo: 0  */
